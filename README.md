@@ -76,8 +76,6 @@ other:
 
 | Command | Description | Example |
 |---------|------------|---------|
-
-
 | `docker version` | Show Docker version | `docker version` |
 | `docker info` | Show system-wide info | `docker info` |
 | `docker inspect` | Inspect container or image | `docker inspect mycontainer` |
