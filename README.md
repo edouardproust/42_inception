@@ -39,10 +39,11 @@ other:
 
 | Command | Description | Example |
 |---------|------------|---------|
-| `docker exec -it <name> <command>` | Run a command in a running container interactively | `docker exec -it mycontainer bash` |
-| `docker attach <name>` | Attach to a running container | `docker attach mycontainer` |
-| `docker logs <name>` | Show container logs | `docker logs mycontainer` |
-| `docker stop <name>` | Stop a running container | `docker stop mycontainer` |
+| `docker exec -it <name\|ID> <command>` | Run a command in a running container interactively | `docker exec -it mycontainer bash` |
+| `docker attach <name\|ID>` | Attach to a running container | `docker attach mycontainer` |
+| `docker logs <name\|ID>` | Show container logs | `docker logs mycontainer` |
+| `docker stop <name\|ID> [<name\|ID>...]` | Stop one or several running container(s) | `docker stop mycontainer`  or `docker stop d1b6 d09d` |
+| `docker rm <name\|ID> [<name\|ID>...]` | Delete one or several running container(s) | `docker rm mycontainer` or `docker rm d1b6 d09d` |
 | `docker restart <name\|ID>` | Restart a container | `docker restart mycontainer` or `docker restart d1b6`|
 | `docker rename <prev_name> <new_name>` | Rename a container | `docker rename d1b6 mycontainer` or `docker rename mycontainer newname`|
 | `docker ps` | List running containers | `docker ps` |
@@ -70,13 +71,31 @@ other:
 | `docker image prune -a` | Remove unused images | `docker image prune -a` |
 | `docker system prune -a` | Remove unused containers, images, volumes, networks | `docker system prune -a` |
 
----
+## Dockerfile
 
-### 6️⃣ Misc / Info
+Here is an example of a simple Dockerfile:
 
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker version` | Show Docker version | `docker version` |
-| `docker info` | Show system-wide info | `docker info` |
-| `docker inspect` | Inspect container or image | `docker inspect mycontainer` |
-| `docker diff` | Show filesystem changes in a container | `docker diff mycontainer` |
+```bash
+# Use the official Ubuntu base image
+FROM ubuntu
+
+# Add metadata about the maintainer of this image
+LABEL maintainer="Edouard Proust <contact@edouardproust.dev>"
+
+# Explicitly set the user to root (though this is usually default)
+USER root
+
+# Copy the entrypoint script from the host into the container's root directory
+COPY ./entrypoint.bash /
+
+# Run commands to prepare the container
+RUN apt -y update
+RUN apt -y install curl bash
+RUN chmod 755 /entrypoint.bash
+
+# Switch to a non-privileged user for security (reduces attack surface)
+USER myuser
+
+# Set the entrypoint script as the default executable when container starts
+ENTRYPOINT [ "/entrypoint.bash" ]
+```
