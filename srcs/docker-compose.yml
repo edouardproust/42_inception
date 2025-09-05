@@ -1,0 +1,77 @@
+name: inception
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: requirements/nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_volume:/var/www/wordpress
+      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+    restart: unless-stopped
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+    container_name: mariadb
+    volumes:
+      - mariadb_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - inception
+    restart: unless-stopped
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: requirements/wordpress/Dockerfile
+    container_name: wordpress
+    volumes:
+      - wordpress_volume:/var/www/wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_URL: https://${DOMAIN}
+      WORDPRESS_TITLE: "42 School Inception Project"
+      WORDPRESS_ADMIN_USER: ${WP_ADMIN_USER}
+      WORDPRESS_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
+      WORDPRESS_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+    networks:
+      - inception
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  redis:
+    build:
+      context: .
+      dockerfile: requirements/redis/Dockerfile
+    container_name: redis
+    networks:
+      - inception
+    restart: unless-stopped
+
+volumes:
+  wordpress_volume:
+    name: wordpress_volume
+  mariadb_volume:
+    name: mariadb_volume
+
+networks:
+  inception:
+    name: inception_network
+    driver: bridge
