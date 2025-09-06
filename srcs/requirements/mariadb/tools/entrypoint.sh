@@ -5,7 +5,7 @@ DATADIR="/var/lib/mysql"
 
 # Initialize Mariadb system tables
 if [ ! -d "${DATADIR}/mysql" ]; then
-    echo "[Entrypoint] Initializing MariaDB..."
+    echo "[mariadb entrypoint] Initializing MariaDB..."
     mariadb-install-db --datadir="${DATADIR}" --basedir=/usr --rpm
 fi
 
@@ -24,11 +24,11 @@ CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_USER_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
-    echo "[Entrypoint] Configuring WP database and users..."
+    echo "[mariadb entrypoint] Configuring WP database and users..."
     mariadbd --bootstrap < /tmp/init.sql
     rm -f /tmp/init.sql
 fi
 
-echo "[Entrypoint] Starting MariaDB..."
+echo "[mariadb entrypoint] Starting MariaDB..."
 exec mariadbd
 
