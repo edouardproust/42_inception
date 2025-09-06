@@ -3,7 +3,7 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    image: nginx:alpine-0.1
+    image: nginx:alpine-1.0
     env_file: .env
     ports:
       - "443:443"
@@ -11,14 +11,14 @@ services:
       - website:/var/www/wordpress
     networks:
       - inception
-    #depends_on:
-    #  - wordpress
+    depends_on:
+      - wordpress
     restart: unless-stopped
 
   mariadb:
     container_name: mariadb
     build: requirements/mariadb
-    image: mariadb:alpine-0.1
+    image: mariadb:alpine-1.0
     env_file: .env
     ports:
       - "3306:3306"
@@ -26,6 +26,31 @@ services:
       - database:/var/lib/mysql
     networks:
       - inception
+    restart: unless-stopped
+
+  wordpress:
+    container_name: wordpress
+    build: requirements/wordpress
+    image: wordpress:alpine-1.0
+    env_file: .env
+    volumes:
+      - website:/var/www/wordpress
+    networks:
+      - inception
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  adminer:
+    container_name: adminer
+    build: requirements/bonus/adminer
+    image: adminer:alpine-0.1
+    ports:
+      - "8080:8080"
+    networks:
+      - inception
+    depends_on:
+      - mariadb
     restart: unless-stopped
 
 volumes:
