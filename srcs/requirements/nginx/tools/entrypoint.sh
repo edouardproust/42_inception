@@ -24,7 +24,7 @@ if [ ! -d /etc/nginx/ssl ]; then
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 		-keyout /etc/nginx/ssl/inception.key \
 		-out /etc/nginx/ssl/inception.crt \
-		-subj "/C=FR/ST=Catalunya/L=Barcelona/O=42/OU=42/CN=${SERVER_NAME}"
+		-subj "CN=${SERVER_NAME}"
 	chmod 600 /etc/nginx/ssl/inception.key
 	chmod 644 /etc/nginx/ssl/inception.crt
 else
