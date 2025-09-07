@@ -1,13 +1,18 @@
-FROM debian:bullseye
+FROM alpine:3.21.4
 
-RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y mariadb-server && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+EXPOSE 3306
 
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
-COPY tools/mariadb.sh /usr/local/bin/mariadb.sh
+# Install mariadb server (creates folder '/var/lib/mysql' and 'mysql' user)
+RUN apk add --no-cache mariadb
 
-RUN chmod +x /usr/local/bin/mariadb.sh
+# Configuration
+COPY ./conf/ /etc/my.cnf.d/
+RUN sed -i 's/skip-networking/#skip-networking/' /etc/my.cnf.d/mariadb-server.cnf
 
-CMD ["/usr/local/bin/mariadb.sh"]
-
+# Setup db and start mariadb server (deamon)
+COPY ./tools/entrypoint.sh /tmp/entrypoint.sh
+RUN chmod +x /tmp/entrypoint.sh
+RUN mkdir -p /run/mysqld && \
+	chown -R mysql:mysql /run/mysqld
+USER mysql
+CMD ["/tmp/entrypoint.sh"]

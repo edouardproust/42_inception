@@ -1,54 +1,62 @@
-services:
+name: inception
 
-  mariadb:
-    container_name: mariadb
-    networks:
-      - inception
-    build: ./requirements/mariadb
-    image: mariadb:1.0
-    env_file: .env
-    volumes:
-      - mariadb:/var/lib/mysql
-    restart: always
-    expose:
-      - "3306"
+services:
 
   nginx:
     container_name: nginx
+    build: requirements/nginx
+    image: nginx:alpine-1.0
+    env_file: .env
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress:/var/www/html
     networks:
       - inception
     depends_on:
       - wordpress
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-      args:
-        DOMAIN_NAME: ${DOMAIN_NAME}
-    image: nginx:1.0
+    restart: unless-stopped
+
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb
+    image: mariadb:alpine-1.0
     env_file: .env
-    volumes:
-      - wordpress:/var/www/wordpress
-    restart: always
     ports:
-      - "443:443"
+      - "3306:3306"
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - inception
+    restart: unless-stopped
 
   wordpress:
     container_name: wordpress
+    build: requirements/wordpress
+    image: wordpress:alpine-1.0
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/html
     networks:
       - inception
     depends_on:
       - mariadb
-    build: ./requirements/wordpress
-    image: wordpress:1.0
-    env_file: .env
-    volumes:
-      - wordpress:/var/www/wordpress
-    restart: always
-    expose:
-      - "9000"
+    restart: unless-stopped
+
+  adminer:
+    container_name: adminer
+    build: requirements/bonus/adminer
+    image: adminer:alpine-1.0
+    #ports:
+    #  - "8080:8080"
+    networks:
+      - inception
+    depends_on:
+      - mariadb
+    restart: unless-stopped
 
 volumes:
-  mariadb:
+  database:
   wordpress:
 
 networks:

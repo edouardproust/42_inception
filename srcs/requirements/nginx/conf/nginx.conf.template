@@ -1,0 +1,38 @@
+events {}
+
+http {
+	include /etc/nginx/mime.types;
+
+	server {
+		listen 443 ssl;
+		server_name SERVER_NAME_PLACEHOLDER www.SERVER_NAME_PLACEHOLDER;
+
+		ssl_certificate /etc/nginx/ssl/inception.crt;
+		ssl_certificate_key /etc/nginx/ssl/inception.key;
+		ssl_protocols TLSv1.2 TLSv1.3;
+
+		root /var/www/html;
+		index index.php index.html index.htm;
+
+		location / {
+			try_files $uri $uri/ =404;
+		}
+
+		location /adminer/ {
+			proxy_pass http://adminer:8080/;
+		}
+
+		location = /adminer {
+			return 301 /adminer/;
+		}
+
+		location ~ \.php$ {
+			include fastcgi_params;
+			try_files $uri =404;
+			fastcgi_pass wordpress:9000;
+			fastcgi_index index.php;
+			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		}
+
+	}
+}

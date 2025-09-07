@@ -1,18 +1,20 @@
-all: env up
+DOCKER_COMPOSE = docker compose -f srcs/docker-compose.yml
+WP_HOST_BIND = ~/Sites/wordpress
 
-env:
-	@sh ./srcs/tools/make_env.sh
+all: up
 
 up:
-	@cd ./srcs && docker compose up -d
+	$(DOCKER_COMPOSE) up -d
 
 down:
-	@cd ./srcs && docker compose down
+	$(DOCKER_COMPOSE) down
 
-downv:
-	@cd ./srcs && docker compose down -v
+clean:
+	$(DOCKER_COMPOSE) down -v
+	docker system prune -af
 
-build:
-	@cd ./srcs && docker compose build --no-cache	
+restart: down up
 
-re: downv env build up
+re: clean up
+
+.PHONY: all up down clean fclean re
