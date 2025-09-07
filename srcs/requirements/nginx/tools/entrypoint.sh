@@ -10,7 +10,8 @@ fi
 # Set server name in conf file
 if [ -f /etc/nginx/nginx.conf.template ]; then
 	echo "[nginx entrypoint] Replacing vars in /etc/nginx/nginx.conf.template ..."
-	sed -i "s/SERVER_NAME_PLACEHOLDER/${DOMAIN_NAME}/g" /etc/nginx/nginx.conf.template
+	sed -i "s/DOMAIN_PLACEHOLDER/${DOMAIN_NAME}/g" /etc/nginx/nginx.conf.template
+	sed -i "s/DOMAIN_STATIC_PLACEHOLDER/${DOMAIN_NAME_STATIC}/g" /etc/nginx/nginx.conf.template
 	echo "[nginx entrypoint] Creating /etc/nginx/nginx.conf ..."
 	mv /etc/nginx/nginx.conf.template /etc/nginx/nginx.conf
 else

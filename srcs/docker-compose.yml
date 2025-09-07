@@ -55,9 +55,20 @@ services:
       - mariadb
     restart: unless-stopped
 
+  static:
+    container_name: static
+    build: requirements/bonus/static
+    image: static:alpine-0.2
+    ports:
+      - "5000:5000"
+    volumes:
+      - /home/${USER}/Sites/static:/app
+    restart: unless-stopped
+
 volumes:
   database:
   wordpress:
+  static:
 
 networks:
   inception:

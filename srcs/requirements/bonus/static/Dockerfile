@@ -4,15 +4,13 @@ RUN apk add --no-cache python3 py3-pip py3-virtualenv
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY website/ .
 
 # Create and activate a virtual environment, then install Flask inside it
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip && \
 	pip install --no-cache-dir -r requirements.txt
-
-COPY . .
 
 EXPOSE 5000
 
