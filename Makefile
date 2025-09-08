@@ -1,7 +1,7 @@
 DOCKER_COMPOSE = docker compose -f srcs/docker-compose.yml
-WP_HOST_BIND = ~/Sites/wordpress
+STATIC_WEBSITE_PATH_ON_HOST = /home/${USER}/Sites/static
 
-all: up
+all: prod
 
 up:
 	$(DOCKER_COMPOSE) up -d
@@ -17,4 +17,12 @@ restart: down up
 
 re: clean up
 
-.PHONY: all up down clean fclean re
+nginx:
+	$(DOCKER_COMPOSE) build nginx
+	$(DOCKER_COMPOSE) up -d --force-recreate nginx
+
+static:
+	$(DOCKER_COMPOSE) build static
+	$(DOCKER_COMPOSE) up -d
+
+.PHONY: all up down clean fclean re static

@@ -15,6 +15,7 @@ services:
       - inception
     depends_on:
       - wordpress
+      - static
     restart: unless-stopped
 
   mariadb:
@@ -59,16 +60,18 @@ services:
     container_name: static
     build: requirements/bonus/static
     image: static:alpine-0.2
-    ports:
-      - "5000:5000"
-    volumes:
-      - /home/${USER}/Sites/static:/app
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    #ports:
+    #  - "5000:5000"
+    networks:
+      - inception
     restart: unless-stopped
 
 volumes:
   database:
   wordpress:
-  static:
 
 networks:
   inception:

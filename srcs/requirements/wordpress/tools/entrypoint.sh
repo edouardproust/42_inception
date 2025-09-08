@@ -30,6 +30,9 @@ else
 		--user_pass=${WP_USER_PASS}
 fi
 
+export HTTP_HOST="${DOMAIN_NAME}"
+export REQUEST_URI="/"
+
 # Run PHP-FPM in the foreground (PID 1)
 php-fpm83 -F
 
