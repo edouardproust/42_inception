@@ -14,7 +14,6 @@ REDIS_SED="That's all, stop editing"
 if wp plugin is-active redis-cache; then
 	echo "$REDIS_LOG Redis cache plugin already installed."
 else
-	echo "$REDIS_LOG Adding redis configuration into wp-config.php..."
 	wp plugin install redis-cache --activate
 fi
 
@@ -22,7 +21,6 @@ fi
 if grep -q "WP_REDIS_HOST" "$WP_CONFIG"; then
 	echo "$REDIS_LOG Redis configuration already in wp-config.php."
 else
-	echo "$REDIS_LOG Adding redis configuration in wp-config.php..."
 	sed -i "/${REDIS_SED}/ i define('WP_REDIS_HOST', '${REDIS_HOST}');" "$WP_CONFIG"
 	sed -i "/${REDIS_SED}/ i define('WP_REDIS_PORT', ${REDIS_PORT});" "$WP_CONFIG"
 fi
@@ -32,6 +30,5 @@ fi
 if wp redis status >/dev/null 2>&1 | grep -q "Status: Connected"; then
 	echo "$REDIS_LOG Redis plugin already enabled."
 else 
-	echo "$REDIS_LOG Enabling redis plugin..."
 	wp redis enable
 fi

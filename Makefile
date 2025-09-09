@@ -21,8 +21,12 @@ nginx:
 	$(DOCKER_COMPOSE) build nginx
 	$(DOCKER_COMPOSE) up -d --force-recreate nginx
 
+wordpress:
+	$(DOCKER_COMPOSE) build wordpress
+	$(DOCKER_COMPOSE) up -d --force-recreate wordpress
+
 static:
 	$(DOCKER_COMPOSE) build static
 	$(DOCKER_COMPOSE) up -d
 
-.PHONY: all up down clean fclean re static
+.PHONY: all up down clean fclean re nginx wordpress static

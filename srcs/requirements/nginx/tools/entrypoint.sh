@@ -2,7 +2,7 @@
 set -e
 
 # Check that global vars are set
-if [ -z "$DOMAIN_NAME" ]; then
+if [ -z "$DOMAIN_WP" ]; then
 	echo "ERROR: WEBSITE_DOMAIN not set. Exiting..."
 	exit 1
 fi
@@ -10,8 +10,8 @@ fi
 # Set server name in conf file
 if [ -f /etc/nginx/nginx.conf.template ]; then
 	echo "[nginx entrypoint] Replacing vars in /etc/nginx/nginx.conf.template ..."
-	sed -i "s/DOMAIN_PLACEHOLDER/${DOMAIN_NAME}/g" /etc/nginx/nginx.conf.template
-	sed -i "s/DOMAIN_STATIC_PLACEHOLDER/${DOMAIN_NAME_STATIC}/g" /etc/nginx/nginx.conf.template
+	sed -i "s/{{DOMAIN_WP}}/${DOMAIN_WP}/g" /etc/nginx/nginx.conf.template
+	sed -i "s/{{DOMAIN_STATIC}}/${DOMAIN_STATIC}/g" /etc/nginx/nginx.conf.template
 	echo "[nginx entrypoint] Creating /etc/nginx/nginx.conf ..."
 	mv /etc/nginx/nginx.conf.template /etc/nginx/nginx.conf
 else
@@ -25,7 +25,7 @@ if [ ! -d /etc/nginx/ssl ]; then
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 		-keyout /etc/nginx/ssl/inception.key \
 		-out /etc/nginx/ssl/inception.crt \
-		-subj "/CN=${DOMAIN_NAME}"
+		-subj "/CN=${DOMAIN_WP}"
 	chmod 600 /etc/nginx/ssl/inception.key
 	chmod 644 /etc/nginx/ssl/inception.crt
 else

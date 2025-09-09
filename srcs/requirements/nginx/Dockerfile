@@ -2,7 +2,9 @@ FROM alpine:3.21.4
 
 EXPOSE 443
 
-RUN apk add --no-cache nginx openssl
+RUN apk add --no-cache \
+	nginx \
+	openssl
 
 # nginx config
 COPY conf/nginx.conf.template /etc/nginx/nginx.conf.template

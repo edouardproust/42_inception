@@ -5,14 +5,15 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    image: nginx:alpine-1.0
+    image: nginx:1.0-alpine
     env_file: .env
     ports:
       - "443:443"
     volumes:
-      - wordpress:/var/www/html
+      - wordpress-data:/var/www/html
     networks:
-      - inception
+      - wordpress-network
+      - static-network
     depends_on:
       - wordpress
       - static
@@ -21,25 +22,25 @@ services:
   mariadb:
     container_name: mariadb
     build: requirements/mariadb
-    image: mariadb:alpine-1.0
+    image: mariadb:1.0-alpine
     env_file: .env
     ports:
       - "3306:3306"
     volumes:
-      - database:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
     networks:
-      - inception
+      - wordpress-network
     restart: unless-stopped
 
   wordpress:
     container_name: wordpress
     build: requirements/wordpress
-    image: wordpress:alpine-1.0
+    image: wordpress:1.0-alpine
     env_file: .env
     volumes:
-      - wordpress:/var/www/html
+      - wordpress-data:/var/www/html
     networks:
-      - inception
+      - wordpress-network
     depends_on:
       - mariadb
       - redis
@@ -52,7 +53,7 @@ services:
     #ports:
     #  - "8080:8080"
     networks:
-      - inception
+      - wordpress-network
     depends_on:
       - mariadb
     restart: unless-stopped
@@ -60,31 +61,46 @@ services:
   static:
     container_name: static
     build: requirements/bonus/static
-    image: static:alpine-0.2
+    image: static:1.0-alpine
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
     #ports:
     #  - "5000:5000"
     networks:
-      - inception
+      - static-network
     restart: unless-stopped
 
   redis:
     container_name: redis
     build: requirements/bonus/redis
+    image: redis:1.0-alpine
     #ports:
     #  - "6379:6379"
     volumes:
-      - redis:/data
+      - redis-data:/data
     networks:
-      - inception
+      - wordpress-network
     restart: unless-stopped
 
+  #ftp:
+  #  container_name: ftp
+  #  build: requirements/bonus/ftp
+  #  image: ftp:0.1-alpine
+  #  ports:
+  #    - "21:21"
+  #    - "30000-30009:30000:30009"
+  #  volumes:
+  #    - wordpress-data:/home/${FTP_USER}/wordpress
+  #  networks:
+  #    - wordpress-network
+  #  restart: unless-stopped
+
 volumes:
-  database:
-  wordpress:
-  redis:
+  mariadb-data:
+  wordpress-data:
+  redis-data:
 
 networks:
-  inception:
+  wordpress-network:
+  static-network:

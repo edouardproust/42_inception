@@ -9,10 +9,14 @@ RUN apk add --no-cache mariadb
 COPY ./conf/ /etc/my.cnf.d/
 RUN sed -i 's/skip-networking/#skip-networking/' /etc/my.cnf.d/mariadb-server.cnf
 
-# Setup db and start mariadb server (deamon)
-COPY ./tools/entrypoint.sh /tmp/entrypoint.sh
-RUN chmod +x /tmp/entrypoint.sh
-RUN mkdir -p /run/mysqld && \
+# Setup db
+COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh && \
+	mkdir -p /run/mysqld && \
 	chown -R mysql:mysql /run/mysqld
+
+# Security
 USER mysql
-CMD ["/tmp/entrypoint.sh"]
+
+# Start mariadb server (daemon)
+CMD ["entrypoint.sh"]

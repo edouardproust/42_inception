@@ -12,8 +12,8 @@ RUN apk add --no-cache \
 	php${PHP_VERSION}-mysqli
 
 # Download adminer
-RUN mkdir -p /var/www/adminer
-RUN wget -O /var/www/adminer/index.php https://github.com/vrana/adminer/releases/download/v${ADMINER_VERSION}/adminer-${ADMINER_VERSION}-mysql-en.php
+RUN mkdir -p /var/www/adminer && \
+	wget -O /var/www/adminer/index.php https://github.com/vrana/adminer/releases/download/v${ADMINER_VERSION}/adminer-${ADMINER_VERSION}-mysql-en.php
 
 
 # Security
