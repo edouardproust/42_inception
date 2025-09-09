@@ -1,16 +1,22 @@
 #!/bin/sh
 
+# Define these vqrs only to mute warnings (functions.php)
+export HTTP_HOST="${DOMAIN_NAME}"
+export REQUEST_URI="/"
+
+# Download and create wp-config.php if not yet
 if CONFIG_FILE="/var/www/html/wp-config.php"; [ -f "$CONFIG_FILE" ]; then
 	echo "[wordpress entrypoint] '$CONFIG_FILE' already exists: skipping wp download and config creation."
 else
 	wp core download
 	wp config create \
-		--dbhost=${DB_HOST} \
+		--dbhost=mariadb \
 		--dbname=${DB_NAME} \
 		--dbuser=${DB_USER} \
 		--dbpass=${DB_USER_PASS}
 fi
 
+# Install WP if not yet
 if wp core is-installed; then
 	echo "[wordpress entrypoint] WP already installed: skipping installation."
 else
@@ -22,6 +28,7 @@ else
 		--admin_email=${WP_ADMIN_EMAIL}
 fi
 
+# Add user if not yet
 if wp user get "${WP_USER}" >/dev/null 2>&1; then
 	echo "[wordpress entrypoint] User already exists: skipping user creation."
 else
@@ -30,8 +37,8 @@ else
 		--user_pass=${WP_USER_PASS}
 fi
 
-export HTTP_HOST="${DOMAIN_NAME}"
-export REQUEST_URI="/"
+# Install and setup redis
+redis.sh
 
 # Run PHP-FPM in the foreground (PID 1)
 php-fpm83 -F
