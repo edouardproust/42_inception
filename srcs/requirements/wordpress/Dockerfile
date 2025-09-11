@@ -1,34 +1,57 @@
-FROM debian:bullseye
+FROM alpine:3.21.4
 
-# Update and upgrade the system, then install necessary dependencies.
-RUN apt-get update -y && apt-get upgrade -y && \
-	apt-get install -y curl bash mariadb-client \
-		php7.4 php-fpm php-mysql php-curl php-dom php-xml php-mbstring && \
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+ARG PHP_VERSION
+ENV PHP_VERSION=${PHP_VERSION}
 
-# Install WP-CLI as root during build
+# for info only
+EXPOSE 9000
+
+# Install mandatory packages + PHP extensions
+RUN apk add --no-cache \
+	curl \
+	php${PHP_VERSION} \
+	# Mandatory PHP extensions
+	php${PHP_VERSION}-fpm \
+	php${PHP_VERSION}-phar \
+	php${PHP_VERSION}-curl \
+	php${PHP_VERSION}-mysqli \
+	php${PHP_VERSION}-mbstring \
+	# Redis PHP extensions
+	php${PHP_VERSION}-pecl-redis \
+	php${PHP_VERSION}-pecl-igbinary \
+	php${PHP_VERSION}-ctype \
+	php${PHP_VERSION}-tokenizer 
+
+# install WP CLI	
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
 	chmod +x wp-cli.phar && \
 	mv wp-cli.phar /usr/local/bin/wp
 
-# Copy the PHP-FPM configuration file into the container.
-COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+# Prepare WP environment
+RUN mkdir -p /var/www/html && \
+	adduser -S www-data -G www-data && \
+	chown -R www-data:www-data /var/www/html
 
-# Create and define WP directory
-WORKDIR /var/www/wordpress
+# Configure PHP and PHP-FPM
+RUN chown -R www-data:www-data /var/log/php${PHP_VERSION} && \
+	sed -i "s/memory_limit = 128M/memory_limit = 512M/" /etc/php${PHP_VERSION}/php.ini && \
+	sed -i "s|listen = 127.0.0.1:9000|listen = 9000|" /etc/php${PHP_VERSION}/php-fpm.d/www.conf
 
-# Copy the custom WordPress setup script and make it executable.
-COPY tools/wordpress.sh /usr/local/bin/wordpress.sh
-RUN chmod +x /usr/local/bin/wordpress.sh
+# Prepare entrypoint scripts
+COPY tools/entrypoint.sh tools/themes.sh tools/menus.sh tools/redis.sh \
+	/usr/local/bin/
+RUN chmod +x \
+	/usr/local/bin/entrypoint.sh \
+	/usr/local/bin/themes.sh \
+	/usr/local/bin/menus.sh \
+	/usr/local/bin/redis.sh
 
-# Make www-data the owner of necessary dirs
-RUN mkdir -p /run/php && \
-	touch /var/log/php7.4-fpm.log && \
-	chown -R www-data:www-data /var/www/wordpress /run/php /var/log/php7.4-fpm.log
+# Mailhog
+RUN echo "[wordpress mailhog] Setting sendmail_path in $PHP_INI..." && \
+	sed -i 's|;sendmail_path =|sendmail_path = "/usr/sbin/sendmail -S mailhog:1025"|' \
+		/etc/php${PHP_VERSION}/php.ini
 
-# Switch user for security purpose
+WORKDIR /var/www/html
 USER www-data
 
-# Set the custom script as the default command to run.
-CMD ["/usr/local/bin/wordpress.sh"]
-
+ENTRYPOINT ["entrypoint.sh"]

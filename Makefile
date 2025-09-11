@@ -1,18 +1,32 @@
-all: env up
+DOCKER_COMPOSE = docker compose -f srcs/docker-compose.yml
+STATIC_WEBSITE_PATH_ON_HOST = /home/${USER}/Sites/static
 
-env:
-	@sh ./srcs/tools/make_env.sh
+all: prod
 
 up:
-	@cd ./srcs && docker compose up -d
+	$(DOCKER_COMPOSE) up -d
 
 down:
-	@cd ./srcs && docker compose down
+	$(DOCKER_COMPOSE) down
 
-downv:
-	@cd ./srcs && docker compose down -v
+clean:
+	$(DOCKER_COMPOSE) down -v
+	docker system prune -af
 
-build:
-	@cd ./srcs && docker compose build --no-cache	
+restart: down up
 
-re: downv env build up
+re: clean up
+
+nginx:
+	$(DOCKER_COMPOSE) build nginx
+	$(DOCKER_COMPOSE) up -d --force-recreate nginx
+
+wordpress:
+	$(DOCKER_COMPOSE) build wordpress
+	$(DOCKER_COMPOSE) up -d --force-recreate wordpress
+
+static:
+	$(DOCKER_COMPOSE) build static
+	$(DOCKER_COMPOSE) up -d
+
+.PHONY: all up down clean fclean re nginx wordpress static

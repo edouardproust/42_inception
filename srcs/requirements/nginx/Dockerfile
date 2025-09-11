@@ -1,20 +1,21 @@
-FROM debian:bullseye
+FROM alpine:3.21.4
 
-RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y nginx openssl
+EXPOSE 443
 
-RUN mkdir -p /etc/nginx/ssl && \
-    openssl req -x509 -nodes \
-    -days 365 \
-    -keyout /etc/nginx/ssl/inception.key \
-    -out /etc/nginx/ssl/inception.crt \
-    -subj "/CN=${DOMAIN_NAME}"
+RUN apk add --no-cache \
+	nginx \
+	openssl
 
-RUN mkdir -p /var/www/wordpress /var/run/nginx && \
-    chmod 755 /var/www/wordpress && \
-    chown -R www-data:www-data /var/www/wordpress
+# nginx config
+COPY conf/nginx.conf.template /etc/nginx/nginx.conf.template
 
-COPY conf/nginx.conf /etc/nginx/nginx.conf
+# entrypoint script
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["nginx", "-g", "daemon off;"]
+# Switch user for security
+RUN chown -R nginx:nginx /etc/nginx
+USER nginx
 
+# Start nginx in the background (daemon off)
+ENTRYPOINT ["entrypoint.sh"]

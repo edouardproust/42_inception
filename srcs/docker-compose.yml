@@ -1,55 +1,123 @@
-services:
+name: inception
 
-  mariadb:
-    container_name: mariadb
-    networks:
-      - inception
-    build: ./requirements/mariadb
-    image: mariadb:1.0
-    env_file: .env
-    volumes:
-      - mariadb:/var/lib/mysql
-    restart: always
-    expose:
-      - "3306"
+services:
 
   nginx:
     container_name: nginx
-    networks:
-      - inception
-    depends_on:
-      - wordpress
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-      args:
-        DOMAIN_NAME: ${DOMAIN_NAME}
-    image: nginx:1.0
+    image: nginx:1.0-alpine
+    build: requirements/nginx
     env_file: .env
-    volumes:
-      - wordpress:/var/www/wordpress
-    restart: always
     ports:
       - "443:443"
+    volumes:
+      - wordpress-data:/var/www/html
+    networks:
+      - wordpress-network
+      - static-network
+    depends_on:
+      - wordpress
+      - static
+    restart: unless-stopped
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:1.0-alpine
+    build: requirements/mariadb
+    env_file: .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - wordpress-network
+    restart: unless-stopped
 
   wordpress:
     container_name: wordpress
-    networks:
-      - inception
-    depends_on:
-      - mariadb
-    build: ./requirements/wordpress
-    image: wordpress:1.0
+    image: wordpress:1.0-alpine
+    build:
+      context: requirements/wordpress
+      args:
+        PHP_VERSION: ${PHP_VERSION}
     env_file: .env
     volumes:
-      - wordpress:/var/www/wordpress
-    restart: always
-    expose:
-      - "9000"
+      - wordpress-data:/var/www/html
+    networks:
+      - wordpress-network
+    depends_on:
+      - mariadb
+      - redis
+    restart: unless-stopped
+
+  adminer:
+    container_name: adminer
+    image: adminer:alpine-1.0
+    build: requirements/bonus/adminer
+    env_file: .env
+    #ports:
+    #  - "8080:8080"
+    networks:
+      - wordpress-network
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  static:
+    container_name: static
+    image: static:1.0-alpine
+    build: requirements/bonus/static
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    ports:
+      - "5000:5000"
+    networks:
+      - static-network
+    restart: unless-stopped
+
+  redis:
+    container_name: redis
+    image: redis:1.0-alpine
+    build: requirements/bonus/redis
+    #ports:
+    #  - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - wordpress-network
+    restart: unless-stopped
+
+  ftp:
+    container_name: ftp
+    image: sftp:1.0-alpine
+    build: requirements/bonus/ftp
+    env_file: .env
+    ports:
+      - "2223:22"
+    volumes:
+      - wordpress-data:/home/${FTP_USER}/wordpress
+      - ftp-data:/etc/ssh
+    networks:
+      - wordpress-network
+    restart: unless-stopped
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog:1.0-alpine
+    build: requirements/bonus/mailhog
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP
+    networks:
+      - wordpress-network
+    restart: unless-stopped
 
 volumes:
-  mariadb:
-  wordpress:
+  mariadb-data:
+  wordpress-data:
+  redis-data:
+  ftp-data:
 
 networks:
-  inception:
+  wordpress-network:
+  static-network:

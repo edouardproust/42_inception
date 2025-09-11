@@ -1,0 +1,7 @@
+# Custom configuration for Inception project
+# This file overrides default settings from mariadb-server.cnf
+
+[mysqld]
+bind-address=0.0.0.0
+skip-host-cache
+skip-name-resolve

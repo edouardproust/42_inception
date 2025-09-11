@@ -1,101 +1,23 @@
-# inception
+# Inception
 
-## Docker Cheatsheet (Step-by-Step Usage)
-
-This cheatsheet is structured around typical workflow steps: Images → Create → Run → Attach/Start → Cleanup.
-
----
-
-### 1️⃣ Images
-
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker images` | List all images | `docker images` |
-| `docker build [-t <name[:tag>]] <context>` | Build an image from a Dockerfile | `docker build -t myapp:1.0 .` |
-| `docker tag <ID\|prev_name> <new_name[:tag]>` | Name an image (if `-t` not used in `docker build`) or rename it | `docker tag d1b6 myapp:1.0` or `docker tag ubuntu:latest myubuntu:0.1` |
-| `docker rmi <name[:tag]\|ID>` | Remove an image | `docker rmi myapp:1.0` or `docker rmi d1b6` |
-
-other:
-
-- |`docker pull` | Pull an image from a registry | `docker pull ubuntu:latest` |
-- | `docker push` | Push an image to a registry | `docker push myrepo/myapp:1.0` |
-
----
-
-### 2️⃣ Containers - Creation & Startup
-
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker create [--name <name>] <image>` | Create a container | `docker create --name mycontainer ubuntu:latest` or `docker container create ubuntu:latest`|
-| `docker start <name\|ID>` | Start a container | `docker start mycontainer` or `docker container start d1b6` |
-| `docker start -ai <name\|ID>` | Start a container and attach it in interactive mode | `docker start -ai mycontainer` |
-| `docker run [--name <name>] <image>` | Create, run, start a container and print on terminal (attached mode): `docker create` + `docker start` + `docker attach` | `docker run --name mycontainer ubuntu:latest` |
-| `docker run -d [--name <name>] <image>` | Create, run and start in the background (detached mode): `docker create` + `docker start` | `docker run -d --name mycontainer ubuntu:latest sleep 3600` |
-| `docker run -it [--name <name>] <image>` | Run in interactive mode: `docker create` + `docker start -ai` | `docker run -it --name mycontainer ubuntu:latest` |
-
----
-
-### 3️⃣ Interacting With Containers
-
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker exec -it <name\|ID> <command>` | Run a command in a running container interactively | `docker exec -it mycontainer bash` |
-| `docker attach <name\|ID>` | Attach to a running container | `docker attach mycontainer` |
-| `docker logs <name\|ID>` | Show container logs | `docker logs mycontainer` |
-| `docker stop <name\|ID> [<name\|ID>...]` | Stop one or several running container(s) | `docker stop mycontainer`  or `docker stop d1b6 d09d` |
-| `docker rm <name\|ID> [<name\|ID>...]` | Delete one or several running container(s) | `docker rm mycontainer` or `docker rm d1b6 d09d` |
-| `docker restart <name\|ID>` | Restart a container | `docker restart mycontainer` or `docker restart d1b6`|
-| `docker rename <prev_name> <new_name>` | Rename a container | `docker rename d1b6 mycontainer` or `docker rename mycontainer newname`|
-| `docker ps` | List running containers | `docker ps` |
-| `docker ps -a` | List all containers | `docker ps -a` |
-
----
-
-### 4️⃣ Volumes
-
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker volume create` | Create a volume | `docker volume create myvolume` |
-| `docker volume ls` | List volumes | `docker volume ls` |
-| `docker volume inspect` | Inspect a volume | `docker volume inspect myvolume` |
-| `docker volume rm` | Remove a volume | `docker volume rm myvolume` |
-
----
-
-### 5️⃣ System & Cleanup
-
-| Command | Description | Example |
-|---------|------------|---------|
-| `docker system df` | Show disk usage | `docker system df` |
-| `docker container prune` | Remove all stopped containers | `docker container prune` |
-| `docker image prune -a` | Remove unused images | `docker image prune -a` |
-| `docker system prune -a` | Remove unused containers, images, volumes, networks | `docker system prune -a` |
-
-## Dockerfile
-
-Here is an example of a simple Dockerfile:
+## Connect to Virtual machine via SSH:
 
 ```bash
-# Use the official Ubuntu base image
-FROM ubuntu
+ssh -p 2222 user@localhost
+```
 
-# Add metadata about the maintainer of this image
-LABEL maintainer="Edouard Proust <contact@edouardproust.dev>"
+## SFTP server
 
-# Explicitly set the user to root (though this is usually default)
-USER root
+In terminal:
+```bash
+sftp -P 2223 ftpuser@localhost
+```
 
-# Copy the entrypoint script from the host into the container's root directory
-COPY ./entrypoint.bash /
-
-# Run commands to prepare the container
-RUN apt -y update
-RUN apt -y install curl bash
-RUN chmod 755 /entrypoint.bash
-
-# Switch to a non-privileged user for security (reduces attack surface)
-USER myuser
-
-# Set the entrypoint script as the default executable when container starts
-ENTRYPOINT [ "/entrypoint.bash" ]
+Using Filezilla:
+```bash
+Host: localhost
+Port: 2223
+Protocol: SFTP
+User: FTP_USER (defined in .env)
+Password: FTP_PASS (defined in .env)
 ```
