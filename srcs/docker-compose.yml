@@ -106,7 +106,7 @@ services:
     image: mailhog:1.0-alpine
     build: requirements/bonus/mailhog
     ports:
-      - "8025:8025" # Web UI
+    # - "8025:8025" # Web UI
       - "1025:1025" # SMTP
     networks:
       - wordpress-network

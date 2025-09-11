@@ -16,13 +16,15 @@ fi
 # Function to add a menu item if it does not exists yet
 add_menu_item() {
 	local item_title="$1"
-	local item_url="$2"	
-	if ! wp menu item list "$MENU_SLUG" --fields=title | grep -q "$item_title" 2>/dev/null; then
-		wp menu item add-custom "$MENU_SLUG" "$item_title" "$item_url"
+	local item_url="$2"
+	local options="$3"
+	if ! wp menu item list "$MENU_SLUG" --fields=title | grep -Fxq "$item_title" 2>/dev/null; then
+		wp menu item add-custom "$MENU_SLUG" "$item_title" "$item_url" $options
 	fi
 }
 
 # Add menu items
 add_menu_item "Home" "/"
-add_menu_item "Portfolio" "https://portfolio.eproust.42.fr"
-add_menu_item "Adminer" "/adminer"
+add_menu_item "Portfolio" "https://portfolio.eproust.42.fr" # "--target=_blank"
+add_menu_item "Adminer" "/adminer" # "--target=_blank"
+add_menu_item "Mailbox" "/mailbox" # "--target=_blank"
