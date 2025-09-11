@@ -1,8 +1,14 @@
 FROM alpine:3.21.4
 
-# TODO Install mailhog here
+EXPOSE 1025 8025
 
-COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Installer wget et certificats SSL
+RUN apk add --no-cache wget
 
-ENTRYPOINT ["entrypoint.sh"]
+# Download Mailhog official binary
+RUN wget -O /usr/local/bin/mailhog https://github.com/mailhog/MailHog/releases/latest/download/MailHog_linux_amd64 \
+    && chmod +x /usr/local/bin/mailhog
+
+# Setup meailhog + start it
+ENTRYPOINT ["mailhog"]
+

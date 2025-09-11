@@ -1,9 +1,10 @@
 FROM alpine:3.21.4
 
+ARG PHP_VERSION
+ENV PHP_VERSION=${PHP_VERSION}
+
 # for info only
 EXPOSE 9000
-
-ARG PHP_VERSION=83
 
 # Install mandatory packages + PHP extensions
 RUN apk add --no-cache \
@@ -37,11 +38,18 @@ RUN chown -R www-data:www-data /var/log/php${PHP_VERSION} && \
 	sed -i "s|listen = 127.0.0.1:9000|listen = 9000|" /etc/php${PHP_VERSION}/php-fpm.d/www.conf
 
 # Prepare entrypoint scripts
-COPY tools/entrypoint.sh tools/create_menu.sh tools/redis.sh /usr/local/bin/
+COPY tools/entrypoint.sh tools/themes.sh tools/menus.sh tools/redis.sh \
+	/usr/local/bin/
 RUN chmod +x \
 	/usr/local/bin/entrypoint.sh \
-	/usr/local/bin/create_menu.sh \
+	/usr/local/bin/themes.sh \
+	/usr/local/bin/menus.sh \
 	/usr/local/bin/redis.sh
+
+# Mailhog
+RUN echo "[wordpress mailhog] Setting sendmail_path in $PHP_INI..." && \
+	sed -i 's|;sendmail_path =|sendmail_path = "/usr/sbin/sendmail -S mailhog:1025"|' \
+		/etc/php${PHP_VERSION}/php.ini
 
 WORKDIR /var/www/html
 USER www-data

@@ -2,16 +2,10 @@
 # Create a wp menu with custom link.
 # Adding a menu via WP-CLI requires the use of a classic theme like twentytwentyone (not compatible with recent Full-Site-Editing or Block themes)
 
-WP_THEME="twentytwentyone"
-MENU_LOG="[wordpress create_menu]"
+MENUS_LOG="[wordpress menus]"
 MENU_SLUG="main-menu"
 
-echo "$MENU_LOG Setup menu using WP-CLI"
-
-# Install the compatible theme
-if ! wp theme is-active $WP_THEME; then
-	wp theme install $WP_THEME --activate
-fi
+echo "$MENUS_LOG Setup menu using WP-CLI"
 
 # Create menu if it does not exists yet
 if ! wp menu list --fields=slug 2>/dev/null | grep -q "$MENU_SLUG"; then

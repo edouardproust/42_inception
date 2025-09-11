@@ -4,8 +4,8 @@ services:
 
   nginx:
     container_name: nginx
-    build: requirements/nginx
     image: nginx:1.0-alpine
+    build: requirements/nginx
     env_file: .env
     ports:
       - "443:443"
@@ -21,8 +21,8 @@ services:
 
   mariadb:
     container_name: mariadb
-    build: requirements/mariadb
     image: mariadb:1.0-alpine
+    build: requirements/mariadb
     env_file: .env
     ports:
       - "3306:3306"
@@ -34,8 +34,11 @@ services:
 
   wordpress:
     container_name: wordpress
-    build: requirements/wordpress
     image: wordpress:1.0-alpine
+    build:
+      context: requirements/wordpress
+      args:
+        PHP_VERSION: ${PHP_VERSION}
     env_file: .env
     volumes:
       - wordpress-data:/var/www/html
@@ -48,8 +51,9 @@ services:
 
   adminer:
     container_name: adminer
-    build: requirements/bonus/adminer
     image: adminer:alpine-1.0
+    build: requirements/bonus/adminer
+    env_file: .env
     #ports:
     #  - "8080:8080"
     networks:
@@ -60,8 +64,8 @@ services:
 
   static:
     container_name: static
-    build: requirements/bonus/static
     image: static:1.0-alpine
+    build: requirements/bonus/static
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
@@ -73,8 +77,8 @@ services:
 
   redis:
     container_name: redis
-    build: requirements/bonus/redis
     image: redis:1.0-alpine
+    build: requirements/bonus/redis
     #ports:
     #  - "6379:6379"
     volumes:
@@ -85,14 +89,25 @@ services:
 
   ftp:
     container_name: ftp
-    build: requirements/bonus/ftp
     image: sftp:1.0-alpine
+    build: requirements/bonus/ftp
     env_file: .env
     ports:
       - "2223:22"
     volumes:
       - wordpress-data:/home/${FTP_USER}/wordpress
       - ftp-data:/etc/ssh
+    networks:
+      - wordpress-network
+    restart: unless-stopped
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog:1.0-alpine
+    build: requirements/bonus/mailhog
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP
     networks:
       - wordpress-network
     restart: unless-stopped

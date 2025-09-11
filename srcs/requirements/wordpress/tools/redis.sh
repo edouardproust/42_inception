@@ -18,8 +18,8 @@ else
 fi
 
 # Add vars to wp-config.php
-wp config set WP_REDIS_HOST "${REDIS_HOST}" --type=constant
-wp config set WP_REDIS_PORT "${REDIS_PORT}" --type=constant
+wp config set WP_REDIS_HOST "${REDIS_HOST}"
+wp config set WP_REDIS_PORT "${REDIS_PORT}" --raw
 
 # Start service in the plugin
 

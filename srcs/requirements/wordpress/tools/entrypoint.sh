@@ -43,8 +43,11 @@ fi
 #wp config set WP_HOME 'http://192.168.1.53' --type=constant
 #wp config set WP_SITEURL 'http://192.168.1.53' --type=constant
 
+# Setup themes
+themes.sh
+
 # Create main menu
-create_menu.sh
+menus.sh
 
 # Install and setup redis
 redis.sh
