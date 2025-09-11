@@ -18,12 +18,8 @@ else
 fi
 
 # Add vars to wp-config.php
-if grep -q "WP_REDIS_HOST" "$WP_CONFIG"; then
-	echo "$REDIS_LOG Redis configuration already in wp-config.php."
-else
-	sed -i "/${REDIS_SED}/ i define('WP_REDIS_HOST', '${REDIS_HOST}');" "$WP_CONFIG"
-	sed -i "/${REDIS_SED}/ i define('WP_REDIS_PORT', ${REDIS_PORT});" "$WP_CONFIG"
-fi
+wp config set WP_REDIS_HOST "${REDIS_HOST}" --type=constant
+wp config set WP_REDIS_PORT "${REDIS_PORT}" --type=constant
 
 # Start service in the plugin
 

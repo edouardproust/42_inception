@@ -10,12 +10,12 @@ RUN apk add --no-cache \
 COPY conf/nginx.conf.template /etc/nginx/nginx.conf.template
 
 # entrypoint script
-COPY tools/entrypoint.sh /tmp/entrypoint.sh
-RUN chmod +x /tmp/entrypoint.sh
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch user for security
 RUN chown -R nginx:nginx /etc/nginx
 USER nginx
 
 # Start nginx in the background (daemon off)
-CMD ["/tmp/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]

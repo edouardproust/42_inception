@@ -39,6 +39,10 @@ else
 		--user_pass=${WP_USER_PASS}
 fi
 
+# Prepare for connexion from host machine
+#wp config set WP_HOME 'http://192.168.1.53' --type=constant
+#wp config set WP_SITEURL 'http://192.168.1.53' --type=constant
+
 # Create main menu
 create_menu.sh
 

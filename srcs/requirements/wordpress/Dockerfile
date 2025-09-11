@@ -18,7 +18,8 @@ RUN apk add --no-cache \
 	# Redis PHP extensions
 	php${PHP_VERSION}-pecl-redis \
 	php${PHP_VERSION}-pecl-igbinary \
-	php${PHP_VERSION}-ctype
+	php${PHP_VERSION}-ctype \
+	php${PHP_VERSION}-tokenizer 
 
 # install WP CLI	
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
@@ -45,4 +46,4 @@ RUN chmod +x \
 WORKDIR /var/www/html
 USER www-data
 
-CMD ["entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]

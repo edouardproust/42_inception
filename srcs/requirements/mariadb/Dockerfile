@@ -19,4 +19,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh && \
 USER mysql
 
 # Start mariadb server (daemon)
-CMD ["entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]

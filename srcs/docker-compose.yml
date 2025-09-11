@@ -65,8 +65,8 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
-    #ports:
-    #  - "5000:5000"
+    ports:
+      - "5000:5000"
     networks:
       - static-network
     restart: unless-stopped
@@ -83,23 +83,25 @@ services:
       - wordpress-network
     restart: unless-stopped
 
-  #ftp:
-  #  container_name: ftp
-  #  build: requirements/bonus/ftp
-  #  image: ftp:0.1-alpine
-  #  ports:
-  #    - "21:21"
-  #    - "30000-30009:30000:30009"
-  #  volumes:
-  #    - wordpress-data:/home/${FTP_USER}/wordpress
-  #  networks:
-  #    - wordpress-network
-  #  restart: unless-stopped
+  ftp:
+    container_name: ftp
+    build: requirements/bonus/ftp
+    image: sftp:1.0-alpine
+    env_file: .env
+    ports:
+      - "2223:22"
+    volumes:
+      - wordpress-data:/home/${FTP_USER}/wordpress
+      - ftp-data:/etc/ssh
+    networks:
+      - wordpress-network
+    restart: unless-stopped
 
 volumes:
   mariadb-data:
   wordpress-data:
   redis-data:
+  ftp-data:
 
 networks:
   wordpress-network:
