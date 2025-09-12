@@ -1,5 +1,7 @@
-.env*
+*.env
+.env.*
 secrets
 *.bak
 *.swp
 *.swo
+github

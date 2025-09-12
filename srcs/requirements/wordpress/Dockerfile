@@ -8,6 +8,7 @@ EXPOSE 9000
 
 # Install mandatory packages + PHP extensions
 RUN apk add --no-cache \
+	su-exec \
 	curl \
 	php${PHP_VERSION} \
 	# Mandatory PHP extensions
@@ -37,21 +38,25 @@ RUN chown -R www-data:www-data /var/log/php${PHP_VERSION} && \
 	sed -i "s/memory_limit = 128M/memory_limit = 512M/" /etc/php${PHP_VERSION}/php.ini && \
 	sed -i "s|listen = 127.0.0.1:9000|listen = 9000|" /etc/php${PHP_VERSION}/php-fpm.d/www.conf
 
-# Prepare entrypoint scripts
-COPY tools/entrypoint.sh tools/themes.sh tools/menus.sh tools/redis.sh \
-	/usr/local/bin/
+# Prepare scripts
+COPY \
+	tools/entrypoint.sh \
+	tools/themes.sh \
+	tools/menus.sh \
+	tools/redis.sh \
+	tools/mailhog.sh \
+		/usr/local/bin/
+
 RUN chmod +x \
 	/usr/local/bin/entrypoint.sh \
 	/usr/local/bin/themes.sh \
 	/usr/local/bin/menus.sh \
-	/usr/local/bin/redis.sh
+	/usr/local/bin/redis.sh \
+	/usr/local/bin/mailhog.sh
 
-# Mailhog
-RUN echo "[wordpress mailhog] Setting sendmail_path in $PHP_INI..." && \
-	sed -i 's|;sendmail_path =|sendmail_path = "/usr/sbin/sendmail -S mailhog:1025"|' \
-		/etc/php${PHP_VERSION}/php.ini
+# Run mailhog script (build)
+RUN mailhog.sh
 
 WORKDIR /var/www/html
-USER www-data
 
 ENTRYPOINT ["entrypoint.sh"]

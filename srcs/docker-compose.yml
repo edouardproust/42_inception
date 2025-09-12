@@ -1,7 +1,28 @@
 name: inception
 
-services:
+secrets:
+  db_root_pass:
+    file: ../secrets/db_root_password.txt 
+  db_user_pass:
+    file: ../secrets/db_user_password.txt
+  wp_admin_pass:
+    file: ../secrets/wp_admin_password.txt
+  wp_user_pass:
+    file: ../secrets/wp_user_password.txt
+  ftp_pass:
+    file: ../secrets/ftp_password.txt
 
+volumes:
+  mariadb-data:
+  wordpress-data:
+  redis-data:
+  ftp-data:
+
+networks:
+  wordpress-network:
+  static-network:
+
+services:
   nginx:
     container_name: nginx
     image: nginx:1.0-alpine
@@ -24,6 +45,9 @@ services:
     image: mariadb:1.0-alpine
     build: requirements/mariadb
     env_file: .env
+    environment:
+      DB_ROOT_PASS_FILE: /run/secrets/db_root_pass
+      DB_USER_PASS_FILE: /run/secrets/db_user_pass
     ports:
       - "3306:3306"
     volumes:
@@ -31,6 +55,9 @@ services:
     networks:
       - wordpress-network
     restart: unless-stopped
+    secrets:
+      - db_root_pass
+      - db_user_pass
 
   wordpress:
     container_name: wordpress
@@ -40,6 +67,10 @@ services:
       args:
         PHP_VERSION: ${PHP_VERSION}
     env_file: .env
+    environment:
+      WP_ADMIN_PASS_FILE: /run/secrets/wp_admin_pass
+      WP_USER_PASS_FILE: /run/secrets/wp_user_pass
+      DB_USER_PASS_FILE: /run/secrets/db_user_pass
     volumes:
       - wordpress-data:/var/www/html
     networks:
@@ -48,6 +79,10 @@ services:
       - mariadb
       - redis
     restart: unless-stopped
+    secrets:
+      - wp_admin_pass
+      - wp_user_pass
+      - db_user_pass
 
   adminer:
     container_name: adminer
@@ -92,6 +127,8 @@ services:
     image: sftp:1.0-alpine
     build: requirements/bonus/ftp
     env_file: .env
+    environment:
+      FTP_PASS_FILE: /run/secrets/ftp_pass
     ports:
       - "2223:22"
     volumes:
@@ -100,24 +137,17 @@ services:
     networks:
       - wordpress-network
     restart: unless-stopped
+    secrets:
+      - ftp_pass
 
   mailhog:
     container_name: mailhog
     image: mailhog:1.0-alpine
     build: requirements/bonus/mailhog
     ports:
-      - "8025:8025" # Web UI
+    # - "8025:8025" # Web UI
       - "1025:1025" # SMTP
     networks:
       - wordpress-network
     restart: unless-stopped
 
-volumes:
-  mariadb-data:
-  wordpress-data:
-  redis-data:
-  ftp-data:
-
-networks:
-  wordpress-network:
-  static-network:

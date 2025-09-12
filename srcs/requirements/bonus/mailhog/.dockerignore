@@ -1,0 +1,12 @@
+*.log
+*.bak
+*.swp
+*.swo
+
+__pycache__/
+*.pyc
+node_modules
+dist
+
+README.md
+.git/
