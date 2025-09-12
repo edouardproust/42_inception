@@ -28,7 +28,9 @@ fclean: clean
 
 restart: down up
 
-re: fclean all
+re: clean all
+
+fre: fclean all
 
 nginx:
 	$(DOCKER_COMPOSE) build nginx
@@ -42,4 +44,22 @@ static:
 	$(DOCKER_COMPOSE) build static
 	$(DOCKER_COMPOSE) up -d
 
-.PHONY: all secrets up down clean fclean re nginx wordpress static
+ftp:
+	$(DOCKER_COMPOSE) build ftp
+	$(DOCKER_COMPOSE) up -d --force-recreate ftp
+
+help:
+	@echo "Available commands:"
+	@echo "secrets"
+	@echo "up"
+	@echo "down"
+	@echo "clean"
+	@echo "fclean"
+	@echo "re"
+	@echo "fre"
+	@echo "nginx"
+	@echo "wordpress"
+	@echo "static"
+	@echo "help"
+
+.PHONY: all secrets up down clean fclean re fre nginx wordpress static ftp help

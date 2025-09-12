@@ -2,16 +2,22 @@
 
 WP_LOG="[wordpress entrypoint]"
 
+# Get secrets from files (added by docker-compose to 'env')
+WP_ADMIN_PASS=$(cat "$WP_ADMIN_PASS_FILE")
+WP_USER_PASS=$(cat "$WP_USER_PASS_FILE")
+DB_USER_PASS=$(cat "$DB_USER_PASS_FILE")
+
 # Define these vqrs only to mute warnings (functions.php)
 export HTTP_HOST="${DOMAIN_WP}"
 export REQUEST_URI="/"
 
 # Download and create wp-config.php if not yet
-if CONFIG_FILE="/var/www/html/wp-config.php"; [ -f "$CONFIG_FILE" ]; then
+CONFIG_FILE="/var/www/html/wp-config.php"
+if [ -f "$CONFIG_FILE" ]; then
 	echo "$WP_LOG '$CONFIG_FILE' already exists: skipping wp download and config creation."
 else
-	wp core download
-	wp config create \
+	su-exec www-data wp core download
+	su-exec www-data wp config create \
 		--dbhost=mariadb \
 		--dbname=${DB_NAME} \
 		--dbuser=${DB_USER} \
@@ -19,10 +25,10 @@ else
 fi
 
 # Install WP if not yet
-if wp core is-installed; then
+if su-exec www-data wp core is-installed >/dev/null 2>&1; then
 	echo "$WP_LOG WP already installed: skipping installation."
 else
-	wp core install \
+	su-exec www-data wp core install \
 		--url=https://${DOMAIN_WP} \
 		--title=${WP_TITLE} \
 		--admin_user=${WP_ADMIN} \
@@ -31,10 +37,10 @@ else
 fi
 
 # Add user if not yet
-if wp user get "${WP_USER}" >/dev/null 2>&1; then
+if su-exec www-data wp user get "${WP_USER}" >/dev/null 2>&1; then
 	echo "$WP_LOG User already exists: skipping user creation."
 else
-	wp user create ${WP_USER} ${WP_USER_EMAIL} \
+	su-exec www-data wp user create ${WP_USER} ${WP_USER_EMAIL} \
 		--role=editor \
 		--user_pass=${WP_USER_PASS}
 fi
@@ -44,14 +50,14 @@ fi
 #wp config set WP_SITEURL 'http://192.168.1.53' --type=constant
 
 # Setup themes
-themes.sh
+su-exec www-data themes.sh
 
 # Create main menu
-menus.sh
+su-exec www-data menus.sh
 
 # Install and setup redis
-redis.sh
+su-exec www-data redis.sh
 
 # Run PHP-FPM in the foreground (PID 1)
-php-fpm83 -F
+exec su-exec www-data php-fpm83 -F
 

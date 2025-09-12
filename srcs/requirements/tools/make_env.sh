@@ -38,18 +38,19 @@ echo "Environment file created: $ENV_FILE"
 echo "Content of $CREDENTIALS_FILE added to $ENV_FILE!"
 
 # Passwords ------------------------------------ #
-
-for item in "${PASSWORD_FILES[@]}"; do
-	IFS=':' read -r filename var_name <<< "$item"
-	password_file="$SECRETS_PATH/$filename"
-	
-	if [ ! -f "$password_file" ]; then
-		error_exit "$filename file is missing"
-	elif [ ! -s "$password_file" ]; then
-		error_exit "$filename file is empty"
-	else
-		password=$(cat "$password_file")
-		echo "${var_name}=${password}" >> "$ENV_FILE"
-	fi
-done
-echo "All passwords added to $ENV_FILE!"
+# Muted because passwords are now managed by docker-compose secrets
+#
+#for item in "${PASSWORD_FILES[@]}"; do
+#	IFS=':' read -r filename var_name <<< "$item"
+#	password_file="$SECRETS_PATH/$filename"
+#	
+#	if [ ! -f "$password_file" ]; then
+#		error_exit "$filename file is missing"
+#	elif [ ! -s "$password_file" ]; then
+#		error_exit "$filename file is empty"
+#	else
+#		password=$(cat "$password_file")
+#		echo "${var_name}=${password}" >> "$ENV_FILE"
+#	fi
+#done
+#echo "All passwords added to $ENV_FILE!"

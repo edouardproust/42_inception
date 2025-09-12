@@ -8,6 +8,7 @@ EXPOSE 9000
 
 # Install mandatory packages + PHP extensions
 RUN apk add --no-cache \
+	su-exec \
 	curl \
 	php${PHP_VERSION} \
 	# Mandatory PHP extensions
@@ -57,6 +58,5 @@ RUN chmod +x \
 RUN mailhog.sh
 
 WORKDIR /var/www/html
-USER www-data
 
 ENTRYPOINT ["entrypoint.sh"]
