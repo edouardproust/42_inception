@@ -140,7 +140,7 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 7. SFTP server (`ftp`): Using SSH encryption for security
 8. Mailhog (`mailhog`): Mail catcher (for dev environment). Acces: [https://\<eproust\>.42.fr/mailbox]()
 
-<img src="subject/inception.jpg" height+"500" alt="Inception 42 Barcelona project" />
+<img src="subject/inception.jpg" height="500" alt="Inception 42 Barcelona project" />
 
 ### Nginx
 
