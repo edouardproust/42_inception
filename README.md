@@ -1,89 +1,124 @@
-# Inception
+# Inception (42 school)
 
 Inception is a system administration and **DevOps** project, focused on containerization using **Docker** and **Docker Compose**.
 It builds a multi-service infrastructure: **WordPress**, **MariaDB**, **Nginx**, **Redis**, **FTP**, **Email catcher** and a **static website** (Python and JS).
 
+View subject [here](subject/en.subject.pdf).
+
+![Inception 42 Barcelona](subject/inception.gif "Inception 42 Barcelona project GIF")
+
 ## How to use
 
-1. Install Docker ([doc](https://docs.docker.com/engine/install/ubuntu/)):
+1. **Install Docker** ([doc](https://docs.docker.com/engine/install/ubuntu/))
+
+	```bash
+	sudo apt-get update
+	sudo apt-get install ca-certificates curl
+	sudo install -m 0755 -d /etc/apt/keyrings
+	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+	sudo chmod a+r /etc/apt/keyrings/docker.asc
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	sudo apt-get update
+	```
+
+2. **Setup domains**
+
+	Update `/etc/hosts` and add the following lines:
+	```
+	127.0.0.1	<eproust>.42.fr
+	127.0.0.1	www.<eproust>.42.fr
+	127.0.0.1	portfolio.<eproust>.42.fr
+	```
+
+3. **Build and run the project**
+
+	```bash
+	cd inception
+	make secrets # Enter credentials to create 'secrets/' folder and 'secrets/*password.txt' files
+	make env # Generate 'srcs/.env' file
+	make up
+	```
+	Use `make help` for the full list of options.
+
+## Tips for building Docker custom images
+
+Building container directly via a Dockerfile is not a good method, because builds and runs take time, and volumes binding can mix things up in the process too.
+
+To build the project, i used the kind-of magic command below. It allows to build the containers step by step.
 ```bash
-sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
+docker run --rm -it alpine:3.21.4 sh
 ```
+`3.21.4` being the version of alpine i wanted to use as a base image. So at this point this is the equivalent of having a `FROM alpine:3.21.4` in a Dockerfile.
+Then i could install the dependencies, and run commands after command to tests things, seeing missing packages, files ownership issues.
+I was replicating in a Dockerfile the succesful commands, and reworking in the temporary `alpine` container for failing commands.
 
-2. Setup domains: update `/etc/hosts` and add the following lines:
-```
-127.0.0.1	<eproust>.42.fr
-127.0.0.1	www.<eproust>.42.fr
-127.0.0.1	portfolio.<eproust>.42.fr
-```
+## How to install on a virtual machine (VM)
 
-3. Build and run the project
-```
-cd inception
-make secrets # Enter credentials to create 'secrets/' folder and 'secrets/*password.txt' files
-make env # Generate 'srcs/.env' file
-make up
-```
-Use `make help` for the full list of options.
+1. **Create the virtual box**
 
-### How to install on a virtual machine (VM)
-
-#### 1. Create the virtual box
-
-1. [Download the minimal image ("netinst") of Debian](https://www.debian.org/distrib/netinst) + choose "amd64"
-2. Create VirtualBox:\
+	- [Download the minimal image ("netinst") of Debian](https://www.debian.org/distrib/netinst) + choose "amd64"
+	- Create VirtualBox:\
 	`$ sudo apt update && sudo apt upgrade -y && sudo apt install virtualbox -y`\
 	`$ virtualbox &` (To run VirtualBox. `&` is for opening it in the background)\
 	In VirtualBox UI:
-	- Click "New"
-	- Name and locate it, select .iso file, check "Skip Unattended Installation" + click "Next"
-	- Set hardware (default) + Virtual Hard disk size (30GB) + Click "Finish"
-3. OS installation:
-	- Select the VM newly created and click "Start"
-	- Choose "Graphical install", then set language, location, keyboard type and locals
-	- Set hostname, root and create the new user as detailled in `credentials.txt`
-	- [Create partitions manually](https://www.youtube.com/watch?v=OQEdjt38ZJA), install no dependencies & install GRUB
+		- Click "New"
+		- Name and locate it, select `.iso` file, check "Skip Unattended Installation" + click "Next"
+		- Set hardware (default) + Virtual Hard disk size (20GB) + Click "Finish"
+	- OS installation:
+		- Select the VM newly created and click "Start"
+		- Choose "Graphical install", then set language, location, keyboard type and locals
+		- Set hostname, root and create the new user as detailled in `credentials.txt`
+		- [Create partitions manually](https://www.youtube.com/watch?v=OQEdjt38ZJA), install no dependencies & install GRUB
 
-#### 2. Install sudo
+	For partitioning, I went for this:
+	```bash
+	$ lsblk
+	NAME                MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINTS
+	sda                   8:0    0   20G  0 disk
+	|-sda1                8:1    0  476M  0 part  /boot
+	|-sda2                8:2    0    1K  0 part
+	`-sda5                8:5    0 19.5G  0 part
+	`-sda5_crypt        254:0    0 19.5G  0 crypt
+		|-LVMGroup-root 254:1    0   13G  0 lvm   /
+		|-LVMGroup-swap 254:2    0  952M  0 lvm   [SWAP]
+		`-LVMGroup-home 254:3    0  5.6G  0 lvm   /home
+	sr0                  11:0    1 1024M  0 rom
+	```
+	`13Go` (up to 17Go) for `root` allows `docker` to run without having to flush images and volumes too often.
 
-1. Reboot the VM, enter encryption key, login as <42_login>
-2. Run commands:
+2. **Install sudo**
+
+	- Reboot the VM, enter encryption key, login as `<42_login>`
+	- Run commands:
 	```bash
 	su # then enter root password
 	apt update && apt upgrade && apt install sudo
 	sudo adduser <eproust> <sudo>
 	```
-3. Reboot to see the changes: `sudo reboot`
-4. Check groups and users:
+	- Reboot to see the changes: `sudo reboot`
+	- Check groups and users:
 	```bash
 	getent passwd <eproust> # reads in file /etc/passwd
 	getent group <sudo> # reads in file /etc/group
 	```
 
-#### 3. Install SSH
+3. **Install SSH**
 
-1. Install SSH:
 	```bash
 	sudo apt install openssh-server -y
 	sudo service ssh restart
 	sudo service ssh status # check if working
 	```
-2. Set port forwarding:
+	Set port forwarding:
 	- Open `VirtualBox` > Select VM in list > icon `Settings` > menu item `Network` > Select `NAT` > button `Port Forwarding`
 	- Create 2 new rules:
 		- `Name: SSH, Protocol: TCP, Host: 2222, Guest port: 22` (leave the rest empty)
 		- `Name: FTP, Protocol: TCP, Host: 2223, Guest port: 2223` (leave the rest empty)
 
-#### 4. Connect to Virtual machine from Host:
-```bash
-ssh -p 2222 <eproust>@localhost
-```
+4. **Connect to Virtual machine from Host**
+	```bash
+	ssh -p 2222 <eproust>@localhost
+	```
 
 ### Credentials
 
@@ -96,6 +131,10 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 
 ## Containers
 
+<table>
+<tr>
+<td width="50%">
+
 1. Nginx (`nginx`): Proxy server + SSL certificates (details below)
 2. Wordpress (`wordpress`): uses PHP-FPM as a PHP runtime and downloads the last version of wordpress. Access: [https://\<eproust\>.42.fr]()
 3. Mariadb (`mariadb`): open source database compatible with mysql
@@ -104,6 +143,13 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 6. Static website (`static`): using Flask (python runtime) + Gunicorn server. Access: [https://\<eproust\>.42.fr/portfolio]()
 7. SFTP server (`ftp`): Using SSH encryption for security
 8. Mailhog (`mailhog`): Mail catcher (for dev environment). Acces: [https://\<eproust\>.42.fr/mailbox]()
+
+</td>
+<td width="50%">
+<img src="subject/inception.jpg" alt="Inception 42 Barcelona project" />
+</td>
+</tr>
+</table>
 
 ### Nginx
 
