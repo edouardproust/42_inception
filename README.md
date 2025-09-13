@@ -131,10 +131,6 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 
 ## Containers
 
-<table>
-<tr>
-<td width="50%">
-
 1. Nginx (`nginx`): Proxy server + SSL certificates (details below)
 2. Wordpress (`wordpress`): uses PHP-FPM as a PHP runtime and downloads the last version of wordpress. Access: [https://\<eproust\>.42.fr]()
 3. Mariadb (`mariadb`): open source database compatible with mysql
@@ -144,12 +140,7 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 7. SFTP server (`ftp`): Using SSH encryption for security
 8. Mailhog (`mailhog`): Mail catcher (for dev environment). Acces: [https://\<eproust\>.42.fr/mailbox]()
 
-</td>
-<td width="50%">
-<img src="subject/inception.jpg" alt="Inception 42 Barcelona project" />
-</td>
-</tr>
-</table>
+<img src="subject/inception.jpg" height+"500" alt="Inception 42 Barcelona project" />
 
 ### Nginx
 
