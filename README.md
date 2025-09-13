@@ -131,24 +131,24 @@ Passwords files (`secrets/*password.txt`) are mounted via `docker-compose` for s
 
 ## Containers
 
-1. Nginx (`nginx`): Proxy server + SSL certificates (details below)
-2. Wordpress (`wordpress`): uses PHP-FPM as a PHP runtime and downloads the last version of wordpress. Access: [https://\<eproust\>.42.fr]()
-3. Mariadb (`mariadb`): open source database compatible with mysql
-4. Redis (`redis`): database serving as cache for the wordpress website (see details below)
-5. Adminer (`adminer`): To vizualize database. Access: [https://\<eproust\>.42.fr/adminer]()
-6. Static website (`static`): using Flask (python runtime) + Gunicorn server. Access: [https://\<eproust\>.42.fr/portfolio]()
-7. SFTP server (`ftp`): Using SSH encryption for security
-8. Mailhog (`mailhog`): Mail catcher (for dev environment). Acces: [https://\<eproust\>.42.fr/mailbox]()
+1. **Nginx (`nginx`):** Proxy server + SSL certificates (details below)
+2. **Wordpress (`wordpress`):** uses PHP-FPM as a PHP runtime and downloads the last version of wordpress. Access: [https://\<eproust\>.42.fr]()
+3. **Mariadb (`mariadb`):** open source database compatible with mysql
+4. **Redis (`redis`):** database serving as cache for the wordpress website (see details below)
+5. **Adminer (`adminer`):** To vizualize database. Access: [https://\<eproust\>.42.fr/adminer]()
+6. **Static website (`static`):** using Flask (python runtime) + Gunicorn server. Access: [https://\<eproust\>.42.fr/portfolio]()
+7. **SFTP server (`ftp`):** Using SSH encryption for security
+8. **Mailhog (`mailhog`):** Mail catcher (for dev environment). Acces: [https://\<eproust\>.42.fr/mailbox]()
 
 <img src="subject/inception.jpg" height="500" alt="Inception 42 Barcelona project" />
 
 ### Nginx
 
 Configuration file (`nginx.conf`):
-- Servers:
-	1. HTTP to HTTPS redirection
-	2. Main domain `<eproust>.42.fr` and subdomain `www.<eproust>.42.fr` both redirect to the wordpress website
-	3. Subdomain `portfolio.<eproust>.42.fr` redirects to the static website
+- **Servers:**
+	- HTTP to HTTPS redirection
+	- Main domain `<eproust>.42.fr` and subdomain `www.<eproust>.42.fr` both redirect to the wordpress website
+	- Subdomain `portfolio.<eproust>.42.fr` redirects to the static website
 - Using custom configuration for `wordpress` container: **nginx works as a server in this case**
 - Using `proxy_pass` for `adminer`, `mailhog` and `static` website containers: **nginx serves just as a proxy here**. Indeed all these 3 containers already have their own server:
 	- `adminer`: PHP FPM (`php-fpm83 -F`). Ran as `www-data` user
@@ -157,13 +157,19 @@ Configuration file (`nginx.conf`):
 
 ### Wordpress
 
-#TODO
-Setup:
 - Ran as `www-data:www-data` user
+- Using WP-CLI for downloading wordpress, creating `wp-config.php` and instaling it, then to setup themes and plugins
+- Use of `su-exec` in `entrypoint.sh`: WP-CLI commands need to run as `www-data` user. We also run PHP-FPM as `www-data` for security purpose. At the same time, we are forced to run entrypoint as `root` due to docker `secrets` used in the script (these are only available as root). Hence the use of `su-exec`.
+- Named volume `inception_wordpress-data` allows to save on the website changes between runs
 
 ### Redis
 
-#TODO
+Redis needed to make 3 things:
+- In `redis` container: install redis and run the server
+- In `wordpress` container: install redis extensions for PHP, and setup variables in `wp-config.php`
+- In `wordpress` container: Add plugin `redis-cache`
+
+We use a named volume `inception_redis-data` to keep cache between runs.
 
 ### SFTP server
 
