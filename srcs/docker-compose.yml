@@ -89,8 +89,6 @@ services:
     image: adminer:alpine-1.0
     build: requirements/bonus/adminer
     env_file: .env
-    #ports:
-    #  - "8080:8080"
     networks:
       - wordpress-network
     depends_on:
@@ -104,8 +102,6 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
-    ports:
-      - "5000:5000"
     networks:
       - static-network
     restart: unless-stopped
@@ -114,8 +110,6 @@ services:
     container_name: redis
     image: redis:1.0-alpine
     build: requirements/bonus/redis
-    #ports:
-    #  - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
@@ -145,7 +139,6 @@ services:
     image: mailhog:1.0-alpine
     build: requirements/bonus/mailhog
     ports:
-    # - "8025:8025" # Web UI
       - "1025:1025" # SMTP
     networks:
       - wordpress-network

@@ -7,10 +7,10 @@ TOOLS_PATH=srcs/requirements/tools
 all: secrets env up
 
 secrets:
-	$(TOOLS_PATH)/make_secrets.sh
+	@$(TOOLS_PATH)/make_secrets.sh
 
 env:
-	$(TOOLS_PATH)/make_env.sh
+	@$(TOOLS_PATH)/make_env.sh
 
 up:
 	$(DOCKER_COMPOSE) up -d
