@@ -90,7 +90,7 @@ I was replicating in a Dockerfile the succesful commands, and reworking in the t
 	- Run commands:
 	```bash
 	su # then enter root password
-	apt update && apt upgrade && apt install sudo
+	apt install sudo
 	sudo adduser <eproust> <sudo>
 	```
 	- Reboot to see the changes: `sudo reboot`
