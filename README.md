@@ -57,7 +57,7 @@ I was replicating in a Dockerfile the succesful commands, and reworking in the t
 
 1. **Create the virtual box**
 
-	- [Download the minimal image ("netinst") of Debian](https://www.debian.org/distrib/netinst) + choose "amd64"
+	- [Download the minimal image ("netinst") of Debian](https://cdimage.debian.org/cdimage/archive/12.9.0/amd64/iso-cd/debian-12.9.0-amd64-netinst.iso)
 	- In VirtualBox UI:
 		- Click "New"
 		- Name and locate the VM, select `.iso` file, check "Skip Unattended Installation" + click "Next"
