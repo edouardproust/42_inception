@@ -12,13 +12,13 @@ View subject [here](subject/en.subject.pdf).
 1. **Install Docker** ([doc](https://docs.docker.com/engine/install/ubuntu/))
 
 	```bash
-	sudo apt-get update
-	sudo apt-get install ca-certificates curl
-	sudo install -m 0755 -d /etc/apt/keyrings
-	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-	sudo chmod a+r /etc/apt/keyrings/docker.asc
-	echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-	sudo apt-get update
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
 	```
 
 2. **Setup domains**
@@ -90,7 +90,7 @@ I was replicating in a Dockerfile the succesful commands, and reworking in the t
 	- Run commands:
 	```bash
 	su # then enter root password
-	apt install sudo
+	apt update && apt install sudo -y
 	sudo adduser <eproust> <sudo>
 	```
 	- Reboot to see the changes: `sudo reboot`
@@ -103,7 +103,7 @@ I was replicating in a Dockerfile the succesful commands, and reworking in the t
 3. **Install SSH**
 
 	```bash
-	sudo apt install openssh-server -y
+	sudo apt update && sudo apt install openssh-server -y
 	sudo service ssh status # check if working
 	```
 	Set port forwarding:
