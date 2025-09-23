@@ -21,6 +21,10 @@ View subject [here](subject/en.subject.pdf).
 	sudo apt-get update
 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	```
+	Add user to `docker` group:
+	```bash
+	sudo adduser <eproust> docker
+	```
 
 2. **Setup domains**
 
@@ -33,7 +37,7 @@ View subject [here](subject/en.subject.pdf).
 
 3. **Build and run the project**
 	```bash
-	sudo apt update && apt ugrade && apt install -y git make
+	sudo apt-get update && apt-get ugrade && apt-get install -y git make
 	git clone https://github.com/edouardproust/42_inception.git inception
 	cd inception
 	make secrets # Enter credentials to create 'secrets/' folder and 'secrets/*password.txt' files
