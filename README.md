@@ -31,8 +31,9 @@ View subject [here](subject/en.subject.pdf).
 	```
 
 3. **Build and run the project**
-
 	```bash
+	sudo apt update && apt ugrade && apt install -y git make
+	git clone https://github.com/edouardproust/42_inception.git inception
 	cd inception
 	make secrets # Enter credentials to create 'secrets/' folder and 'secrets/*password.txt' files
 	make env # Generate 'srcs/.env' file
@@ -115,11 +116,7 @@ I was replicating in a Dockerfile the succesful commands, and reworking in the t
 	```bash
 	ssh -p 2222 <eproust>@localhost
 	```
-
-5. **Install extra packages**
-	```bash
-	sud apt install -y make git vim
-	```
+	From this terminal, you can now follow the steps of "How to use" part of this readme.
 
 ### Credentials
 
