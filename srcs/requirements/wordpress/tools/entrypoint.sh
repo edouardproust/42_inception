@@ -11,6 +11,10 @@ DB_USER_PASS=$(cat "$DB_USER_PASS_FILE")
 export HTTP_HOST="${DOMAIN_WP}"
 export REQUEST_URI="/"
 
+# Wait for database
+echo "$WP_LOG Waiting for database..."
+wait-for-it.sh mariadb:3306 --timeout=60 --strict
+
 # Download and create wp-config.php if not yet
 CONFIG_FILE="/var/www/html/wp-config.php"
 if [ -f "$CONFIG_FILE" ]; then

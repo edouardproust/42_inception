@@ -23,10 +23,14 @@ RUN apk add --no-cache \
 	php${PHP_VERSION}-ctype \
 	php${PHP_VERSION}-tokenizer 
 
+# install wait-for-it
+RUN apk add --no-cache bash && \
+	curl -o /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
+	chmod +x /usr/local/bin/wait-for-it.sh
+
 # install WP CLI	
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-	chmod +x wp-cli.phar && \
-	mv wp-cli.phar /usr/local/bin/wp
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+	chmod +x /usr/local/bin/wp
 
 # Prepare WP environment
 RUN mkdir -p /var/www/html && \
