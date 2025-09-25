@@ -14,7 +14,17 @@ secrets:
 
 volumes:
   mariadb-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USER}/data/mariadb
+      o: bind
   wordpress-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USER}/data/wordpress
+      o: bind
   redis-data:
   ftp-data:
 
@@ -86,7 +96,7 @@ services:
 
   adminer:
     container_name: adminer
-    image: adminer:alpine-1.0
+    image: adminer:1.0-alpine
     build: requirements/bonus/adminer
     env_file: .env
     networks:
@@ -118,7 +128,7 @@ services:
 
   ftp:
     container_name: ftp
-    image: sftp:1.0-alpine
+    image: ftp:1.0-alpine
     build: requirements/bonus/ftp
     env_file: .env
     environment:

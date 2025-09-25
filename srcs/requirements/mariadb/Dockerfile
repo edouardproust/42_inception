@@ -3,7 +3,7 @@ FROM alpine:3.21.4
 EXPOSE 3306
 
 # Install mariadb server (creates folder '/var/lib/mysql' and 'mysql' user)
-RUN apk add --no-cache mariadb su-exec
+RUN apk add --no-cache mariadb mariadb-client su-exec
 
 # Configuration
 COPY ./conf/ /etc/my.cnf.d/
