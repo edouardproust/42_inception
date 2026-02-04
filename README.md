@@ -34,6 +34,7 @@ View subject [here](subject/en.subject.pdf).
 	cd inception
 	make secrets # Enter credentials to create 'secrets/' folder and 'secrets/*password.txt' files
 	make env # Generate 'srcs/.env' file
+	make volumes
 	make up
 	```
 	Use `make help` for the full list of options.
