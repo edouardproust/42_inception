@@ -9,11 +9,16 @@ View subject [here](subject/en.subject.pdf).
 
 ## How to use
 
-1. **Install Docker** ([doc](https://docs.docker.com/engine/install/ubuntu/))
+1. **Install Docker & Docker-compose V2** ([doc](https://docs.docker.com/engine/install/ubuntu/))
 
 	```bash
 	sudo apt update
- 	sudo apt install -y docker.io docker-compose
+	sudo apt install ca-certificates curl
+	sudo install -m 0755 -d /etc/apt/keyrings
+	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+	sudo chmod a+r /etc/apt/keyrings/docker.asc
+	sudo apt update
+	sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
 	```
 	Add user to `docker` group:
 	```bash
