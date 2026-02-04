@@ -11,7 +11,7 @@ View subject [here](subject/en.subject.pdf).
 
 1. **Install Docker**
 
-	Install Docker & Docker-compose V2 for Linux: https://docs.docker.com/engine/install/ubuntu/)
+	Install Docker & Docker-compose V2 for Linux: [official doc](https://docs.docker.com/engine/install/ubuntu/)
 	
 	Add user to `docker` group:
 	```bash
