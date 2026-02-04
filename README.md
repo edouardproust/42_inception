@@ -9,23 +9,16 @@ View subject [here](subject/en.subject.pdf).
 
 ## How to use
 
-1. **Install Docker & Docker-compose V2** ([doc](https://docs.docker.com/engine/install/ubuntu/))
+1. **Install Docker**
 
-	```bash
-	sudo apt update
-	sudo apt install ca-certificates curl
-	sudo install -m 0755 -d /etc/apt/keyrings
-	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-	sudo chmod a+r /etc/apt/keyrings/docker.asc
-	sudo apt update
-	sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
-	```
+	Install Docker & Docker-compose V2 for Linux: https://docs.docker.com/engine/install/ubuntu/)
+	
 	Add user to `docker` group:
 	```bash
 	sudo adduser <eproust> docker
 	```
 
-2. **Setup domains**
+3. **Setup domains**
 
 	Update `/etc/hosts` and add the following lines:
 	```
@@ -34,7 +27,7 @@ View subject [here](subject/en.subject.pdf).
 	127.0.0.1	portfolio.<eproust>.42.fr
 	```
 
-3. **Build and run the project**
+4. **Build and run the project**
 	```bash
 	sudo apt update && apt ugrade && apt install -y git make
 	git clone https://github.com/edouardproust/42_inception.git inception
